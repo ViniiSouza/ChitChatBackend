@@ -16,6 +16,10 @@ namespace Chat.Infra.Mappings
                 .WithOne()
                 .HasForeignKey<Conversation>(prop => prop.LastMessageId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(prop => prop.Participants)
+                .WithOne(prop => prop.Conversation)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

@@ -33,6 +33,10 @@ namespace Chat.Infra.Mappings
             builder.HasMany(prop => prop.MessagePermissions)
                 .WithOne(prop => prop.Sender)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasMany(prop => prop.Conversations)
+                .WithOne(prop => prop.User)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

@@ -19,5 +19,7 @@
         public List<UserContact> Contacts { get; set; }
 
         public List<MessagePermission> MessagePermissions { get; set; }
+
+        public List<User_Conversation> Conversations { get; set; }
     }
 }
