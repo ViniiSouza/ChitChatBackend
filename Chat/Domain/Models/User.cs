@@ -17,5 +17,7 @@
         public List<Message> MessagesSent { get; set; }
 
         public List<Message> ReceivedMessages { get; set; }
+
+        public List<UserContact> Contacts { get; set; }
     }
 }
