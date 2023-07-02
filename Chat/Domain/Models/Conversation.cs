@@ -10,7 +10,9 @@ namespace Chat.Domain.Models
 
         public string? Title { get; set; }
 
-        public Message LastMessage { get; set; }
+        public Message? LastMessage { get; set; }
+
+        public int? LastMessageId { get; set; }
 
         public int LastMessageId { get; set; }
     }
