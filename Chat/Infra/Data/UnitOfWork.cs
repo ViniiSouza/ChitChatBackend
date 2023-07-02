@@ -15,6 +15,8 @@ namespace Chat.Infra.Data
 
         private IUserRepository _userRepository;
         private IMessageRequestRepository _messageRequestRepository;
+        private IConversationRepository _conversationRepository;
+        private IMessagePermissionRepository _messagePermissionRepository;
         public UnitOfWork(DbContextOptions<ChatDbContext> options)
         {
             _context = new ChatDbContext(options);
@@ -54,6 +56,27 @@ namespace Chat.Infra.Data
                     _messageRequestRepository = new MessageRequestRepository(_context);
 
                 return _messageRequestRepository;
+            }
+        }
+
+        public IConversationRepository ConversationRepository
+        {
+            get
+            {
+                if (_conversationRepository is null)
+                    _conversationRepository = new ConversationRepository(_context);
+
+                return _conversationRepository;
+            }
+        }
+        public IMessagePermissionRepository MessagePermissionRepository
+        {
+            get
+            {
+                if (_messagePermissionRepository is null)
+                    _messagePermissionRepository = new MessagePermissionRepository(_context);
+
+                return _messagePermissionRepository;
             }
         }
 
