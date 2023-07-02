@@ -9,5 +9,10 @@ namespace Chat.Infra.Repositories
         public MessagePermissionRepository(ChatDbContext context) : base(context)
         {
         }
+
+        public bool CanUserMessage(int senderId, int receiverId)
+        {
+            return _context.Set<MessagePermission>().Any(any => any.SenderId == senderId && any.ReceiverId == receiverId);
+        }
     }
 }
