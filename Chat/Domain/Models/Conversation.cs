@@ -9,5 +9,9 @@ namespace Chat.Domain.Models
         public List<User> Participants { get; set; }
 
         public string? Title { get; set; }
+
+        public Message LastMessage { get; set; }
+
+        public int LastMessageId { get; set; }
     }
 }
