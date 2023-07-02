@@ -8,6 +8,8 @@
 
         public string Password { get; set; }
 
+        public bool IsPublicProfile { get; set; }
+
         public List<MessageRequest> RequestsSolicited { get; set; }
 
         public List<MessageRequest> RequestsReceived { get; set; }
