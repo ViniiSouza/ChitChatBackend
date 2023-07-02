@@ -2,6 +2,17 @@
 {
     public class MessagePermission : EntityBase
     {
+        public MessagePermission(int senderId, int receiverId)
+        {
+            SenderId = senderId;
+            ReceiverId = receiverId;
+        }
+
+        public MessagePermission()
+        {
+
+        }
+
         public User Sender { get; set; }
 
         public int SenderId { get; set; }

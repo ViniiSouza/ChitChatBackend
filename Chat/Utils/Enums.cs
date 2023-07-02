@@ -15,4 +15,11 @@
         Addition = 3,
         Removal = 4
     }
+
+    public enum EMessageSender
+    {
+        None = 0,
+        Self = 1,
+        Other = 2
+    }
 }

@@ -18,5 +18,8 @@ namespace Chat.Application.DTOs
         [Required]
         [Compare("Password")]
         public string PasswordConfirm { get; set; }
+
+        [Required]
+        public bool IsPublicProfile { get; set; }
     }
 }
