@@ -22,10 +22,6 @@ namespace Chat.Infra.Mappings
                 .WithOne(prop => prop.Requester)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasMany(prop => prop.ReceivedMessages)
-                .WithOne(prop => prop.Receiver)
-                .OnDelete(DeleteBehavior.NoAction);
-
             builder.HasMany(prop => prop.MessagesSent)
                 .WithOne(prop => prop.Sender)
                 .OnDelete(DeleteBehavior.NoAction);
