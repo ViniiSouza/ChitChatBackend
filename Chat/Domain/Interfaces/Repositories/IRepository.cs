@@ -9,5 +9,6 @@ namespace Chat.Domain.Interfaces.Repositories
         public void Create(T entity);
         public void Update(T entity);
         public void Delete(T entity);
+        public void DetachInstance(T instance);
     }
 }

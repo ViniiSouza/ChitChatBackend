@@ -48,5 +48,10 @@ namespace Chat.Infra.Repositories
         {
             _context.Update(entity);
         }
+
+        public virtual void DetachInstance(T instance)
+        {
+            _context.Entry(instance).State = EntityState.Detached;
+        }
     }
 }
