@@ -47,5 +47,13 @@ namespace ChatAPI.Controllers
             var result = _appService.CreatePrivateByRequest(requestId, userName);
             return Ok(result);
         }
+
+        [HttpGet("load-all")]
+        public IActionResult GetAllFromUser() // handle filters in the future
+        {
+            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            var result = _appService.LoadConversationsByUser(userName);
+            return Ok(result);
+        }
     }
 }

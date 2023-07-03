@@ -31,9 +31,11 @@ namespace Chat.Infra.Repositories
 
         public List<Conversation> GetAllSimpleByUser(int userId, params Expression<Func<Conversation, object>>[] includes)
         {
-            var query = _context.Set<Conversation>().Where(where => where.Participants.Any(any => any.UserId == userId));
-
-            query.Include(include => include.Participants);
+            var query = _context.Set<Conversation>()
+                .Include(include => include.LastMessage)
+                .Include(include => include.Participants)
+                .ThenInclude(include => include.User)
+                .Where(where => where.Participants.Any(any => any.UserId == userId));
 
             if (includes != null && includes.Any() )
             {

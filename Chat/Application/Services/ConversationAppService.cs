@@ -18,12 +18,13 @@ namespace Chat.Application.Services
             var user = _unitOfWork.UserRepository.GetByUserName(username); // validação
             var conversations = _unitOfWork.ConversationRepository.GetAllSimpleByUser(user.Id).Select(select => new ConversationSimpleDTO()
             {
+                Id = select.Id,
                 Title = select.Participants.FirstOrDefault(where => where.UserId != user.Id).User.Name, // this will change when implemented group chats
                 LastMessage = _mapper.Map<MessageSimpleDTO>(select.LastMessage),
                 Type = select.Type
             }).ToList();
 
-            return conversations;
+            return conversations.OrderByDescending(order => order.LastMessage?.SendingTime).ToList();
         }
 
         public ConversationSimpleDTO CreatePrivateByRequest(int messageRequestId, string userName)
