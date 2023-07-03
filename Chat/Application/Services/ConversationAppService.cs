@@ -81,7 +81,13 @@ namespace Chat.Application.Services
 
             _unitOfWork.Save();
 
+            _unitOfWork.ConversationRepository.DetachInstance(conversation);
+
             _unitOfWork.ConversationRepository.UpdateLastMessage(conversation.Id, firstMessage.Id);
+
+            _unitOfWork.Save();
+
+            _unitOfWork.MessageRequestRepository.Delete(messageRequest);
 
             _unitOfWork.Save();
 
