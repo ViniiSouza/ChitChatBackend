@@ -50,5 +50,10 @@ namespace Chat.Infra.Repositories
             _context.Attach(entity);
             _context.Entry(entity).Property(p => p.LastMessageId).IsModified = true;
         }
+
+        public bool ExistsPrivateConversation(int firstUserId, int secondUserId)
+        {
+            return _context.Set<Conversation>().Any(where => where.Participants.Any(any => any.UserId == firstUserId) && where.Participants.Any(any => any.UserId == secondUserId));
+        }
     }
 }

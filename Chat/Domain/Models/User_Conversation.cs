@@ -6,6 +6,7 @@
         {
             UserId = userId;
             ConversationId = conversationId;
+            CreationDate = DateTime.Now;
         }
 
         public User_Conversation()

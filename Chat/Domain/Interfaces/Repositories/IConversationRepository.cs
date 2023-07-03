@@ -11,5 +11,7 @@ namespace Chat.Domain.Interfaces.Repositories
         Conversation Create(List<User_Conversation> participants, EChatType type);
 
         void UpdateLastMessage(int conversationId, int messageId);
+
+        bool ExistsPrivateConversation(int firstUserId, int secondUserId);
     }
 }

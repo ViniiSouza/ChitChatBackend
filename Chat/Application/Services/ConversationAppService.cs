@@ -44,6 +44,11 @@ namespace Chat.Application.Services
 
             SetMessagePermission(requester.Id, receiver.Id);
 
+            if (_unitOfWork.ConversationRepository.ExistsPrivateConversation(requester.Id, receiver.Id))
+            {
+                throw new InvalidOperationException("There is already a chat between the users!");
+            }
+
             var conversation = _unitOfWork.ConversationRepository.Create(new List<User_Conversation>(), EChatType.Private);
 
             _unitOfWork.Save();
@@ -122,7 +127,12 @@ namespace Chat.Application.Services
             }
 
             SetMessagePermission(creator.Id, receiver.Id);
-            
+
+            if (_unitOfWork.ConversationRepository.ExistsPrivateConversation(creator.Id, receiver.Id))
+            {
+                throw new InvalidOperationException("There is already a chat between the users!");
+            }
+
             var conversation = _unitOfWork.ConversationRepository.Create(new List<User_Conversation>(), EChatType.Private);
 
             _unitOfWork.Save();
@@ -159,6 +169,8 @@ namespace Chat.Application.Services
             _unitOfWork.MessageRepository.Create(firstMessage);
 
             _unitOfWork.Save();
+
+            _unitOfWork.ConversationRepository.DetachInstance(conversation);
 
             _unitOfWork.ConversationRepository.UpdateLastMessage(conversation.Id, firstMessage.Id);
 
