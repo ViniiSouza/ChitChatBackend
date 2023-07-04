@@ -20,7 +20,15 @@ namespace Chat.Application.Services
             {
                 Id = select.Id,
                 Title = select.Participants.FirstOrDefault(where => where.UserId != user.Id).User.Name, // this will change when implemented group chats
-                LastMessage = _mapper.Map<MessageSimpleDTO>(select.LastMessage),
+                LastMessage = _mapper.Map<MessageSimpleDTO>(select.LastMessage, opt => opt.AfterMap((src, dest) => {
+                    if (dest is not null
+                        && select is not null
+                        && select.LastMessage is not null
+                        && select.LastMessage.Sender is not null)
+                    {
+                        dest.OwnMessage = select?.LastMessage?.Sender?.UserName == username;
+                    }
+                })),
                 Type = select.Type
             }).ToList();
 

@@ -11,5 +11,7 @@ namespace Chat.Application.DTOs
         public string SenderName { get; set; }
 
         public DateTime SendingTime { get; set; }
+
+        public bool OwnMessage { get; set; }
     }
 }
