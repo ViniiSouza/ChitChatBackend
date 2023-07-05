@@ -23,7 +23,8 @@ namespace Chat.Infra.Repositories
                 .OrderByDescending(by => by.CreationDate)
                 .Include(include => include.Sender)
                 .Where(where => where.ChatId == conversationId)
-                .Skip(skipCount).Take(pageSize).ToList();
+                .Skip(skipCount).Take(pageSize)
+                .OrderBy(order => order.CreationDate).ToList();
         }
     }
 }
