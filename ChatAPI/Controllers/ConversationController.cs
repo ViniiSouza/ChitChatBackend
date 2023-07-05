@@ -55,5 +55,13 @@ namespace ChatAPI.Controllers
             var result = _appService.LoadConversationsByUser(userName);
             return Ok(result);
         }
+
+        [HttpGet("chat/{id}")]
+        public IActionResult GetConversation([FromRoute] int id)
+        {
+            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            var result = _appService.GetConversation(id, userName);
+            return Ok(result);
+        }
     }
 }

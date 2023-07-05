@@ -9,6 +9,7 @@ namespace Chat.Application.Mappers.Profiles
         public ConversationProfile()
         {
             CreateMap<Conversation, ConversationSimpleDTO>();
+            CreateMap<Conversation, ConversationDTO>();
         }
     }
 }

@@ -47,7 +47,7 @@ namespace Chat.Infra.Repositories
 
         public void UpdateLastMessage(int conversationId, int messageId)
         {
-            var entity = GetById(conversationId);
+            var entity = base.GetById(conversationId);
             entity.LastMessageId = messageId;
             _context.Attach(entity);
             _context.Entry(entity).Property(p => p.LastMessageId).IsModified = true;
@@ -56,6 +56,19 @@ namespace Chat.Infra.Repositories
         public bool ExistsPrivateConversation(int firstUserId, int secondUserId)
         {
             return _context.Set<Conversation>().Any(where => where.Participants.Any(any => any.UserId == firstUserId) && where.Participants.Any(any => any.UserId == secondUserId));
+        }
+
+        // Must not provide conversation without user validation
+        public override Conversation? GetById(int id, params Expression<Func<Conversation, object>>[] includes)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Conversation? GetById(int id, int userId)
+        {
+            var query = _context.Set<Conversation>().AsNoTracking().Where(where => where.Id == id && where.Participants.Any(any => any.UserId == userId));
+
+            return query.FirstOrDefault();
         }
     }
 }

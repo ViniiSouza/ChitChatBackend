@@ -15,7 +15,7 @@ namespace Chat.Application.Services
 
         public List<ConversationSimpleDTO> LoadConversationsByUser(string username)
         {
-            var user = _unitOfWork.UserRepository.GetByUserName(username); // validação
+            var user = _unitOfWork.UserRepository.GetByUserName(username);
             var conversations = _unitOfWork.ConversationRepository.GetAllSimpleByUser(user.Id).Select(select => new ConversationSimpleDTO()
             {
                 Id = select.Id,
@@ -33,6 +33,30 @@ namespace Chat.Application.Services
             }).ToList();
 
             return conversations.OrderByDescending(order => order.LastMessage?.SendingTime).ToList();
+        }
+
+        public ConversationDTO GetConversation(int conversationId, string username)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(username);
+            var conversationEntity = _unitOfWork.ConversationRepository.GetById(conversationId, user.Id);
+            if (conversationEntity == null)
+            {
+                throw new InvalidOperationException("Chat not found!");
+            }
+            var messages = _unitOfWork.MessageRepository.GetPaged(conversationEntity.Id);
+            var conversation = _mapper.Map<ConversationDTO>(conversationEntity);
+
+            conversation.Messages = messages.Select(select => new MessageDTO()
+            {
+                Id = select.Id,
+                Action = select.Action,
+                Content = select.Content,
+                SenderName = select.Sender is not null ? select.Sender.Name : "",
+                OwnMessage = select.Sender is not null && select.Sender.UserName == username,
+                SendingTime = select.CreationDate
+            }).ToList();
+
+            return conversation;
         }
 
         public ConversationSimpleDTO CreatePrivateByRequest(int messageRequestId, string userName)
@@ -109,7 +133,7 @@ namespace Chat.Application.Services
 
             var result = _mapper.Map<ConversationSimpleDTO>(conversation);
 
-            result.LastMessage.MessageSender = EMessageSender.Other;
+            result.LastMessage.OwnMessage = false;
             
             return result;
         }
@@ -189,7 +213,7 @@ namespace Chat.Application.Services
 
             var result = _mapper.Map<ConversationSimpleDTO>(conversation);
 
-            result.LastMessage.MessageSender = EMessageSender.Self;
+            result.LastMessage.OwnMessage = true;
             result.LastMessage.SenderName = creator.Name;
             result.Id = conversation.Id;
 

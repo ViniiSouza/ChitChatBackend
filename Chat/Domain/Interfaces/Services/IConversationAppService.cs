@@ -27,5 +27,13 @@ namespace Chat.Domain.Interfaces.Services
         /// <param name="userName">Token username</param>
         /// <returns>A DTO with informations of the created conversation</returns>
         ConversationSimpleDTO CreateAllowedPrivate(ConversationCreateDTO dto, string userName);
+
+        /// <summary>
+        /// Validates if the user is a participant of the conversation and if true, return a DTO of the conversation, with the last 20 messages
+        /// </summary>
+        /// <param name="conversationId">Id of the conversation</param>
+        /// <param name="username">Token username</param>
+        /// <returns>A DTO of the conversation, with the last 20 messages</returns>
+        ConversationDTO GetConversation(int conversationId, string username);
     }
 }

@@ -13,5 +13,7 @@ namespace Chat.Domain.Interfaces.Repositories
         void UpdateLastMessage(int conversationId, int messageId);
 
         bool ExistsPrivateConversation(int firstUserId, int secondUserId);
+
+        Conversation? GetById(int id, int userId);
     }
 }

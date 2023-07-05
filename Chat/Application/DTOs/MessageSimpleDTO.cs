@@ -6,8 +6,6 @@ namespace Chat.Application.DTOs
     {
         public string Content { get; set; }
 
-        public EMessageSender MessageSender { get; set; }
-
         public string SenderName { get; set; }
 
         public DateTime SendingTime { get; set; }
