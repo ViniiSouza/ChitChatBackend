@@ -63,5 +63,13 @@ namespace ChatAPI.Controllers
             var result = _appService.GetConversation(id, userName);
             return Ok(result);
         }
+
+        [HttpGet("contacts")]
+        public IActionResult GetContacts()
+        {
+            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            var result = _appService.GetContactsByUser(userName);
+            return Ok(result);
+        }
     }
 }

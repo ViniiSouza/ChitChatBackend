@@ -232,5 +232,21 @@ namespace Chat.Application.Services
                 _unitOfWork.MessagePermissionRepository.Create(new MessagePermission(secondUserId, firstUserId));
             }
         }
+
+        public List<UserSimpleDTO> GetContactsByUser(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            return _unitOfWork.User_ContactRepository.GetContactsByUserId(user.Id).Select(select => new UserSimpleDTO()
+            {
+                Id = select.ContactId,
+                UserName = select.Contact.Name
+            }).ToList();
+        }
     }
 }
