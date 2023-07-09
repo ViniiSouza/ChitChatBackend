@@ -2,9 +2,7 @@
 using Chat.Application.DTOs;
 using Chat.Domain.Interfaces.Services;
 using Chat.Domain.Models;
-using Chat.Extensions;
 using Chat.Infra.Data;
-using Chat.Security;
 
 namespace Chat.Application.Services
 {
@@ -26,6 +24,36 @@ namespace Chat.Application.Services
             _unitOfWork.MessageRequestRepository.CreateRequest(requester.Id, receiver.Id, message);
             _unitOfWork.Save();
             return null;
+        }
+
+        public List<UserSimpleDTO> GetContactsByUser(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            return _unitOfWork.User_ContactRepository.GetContactsByUserId(user.Id).Select(select => new UserSimpleDTO()
+            {
+                Id = select.ContactId,
+                UserName = select.Contact.Name
+            }).ToList();
+        }
+
+        public bool RemoveContact(string userName, int targetContactId)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            var result = _unitOfWork.User_ContactRepository.RemoveUserContact(user.Id, targetContactId);
+            _unitOfWork.Save();
+            return result;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Chat.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ChatAPI.Controllers
 {
@@ -53,6 +54,21 @@ namespace ChatAPI.Controllers
 
         #endregion
 
+        [HttpGet("contacts")]
+        public IActionResult GetContacts()
+        {
+            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            var result = _appService.GetContactsByUser(userName);
+            return Ok(result);
+        }
+
+        [HttpDelete("contacts/{id}")]
+        public IActionResult RemoveContact([FromRoute] int id)
+        {
+            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            _appService.RemoveContact(userName, id);
+            return Ok();
+        }
 
     }
 }

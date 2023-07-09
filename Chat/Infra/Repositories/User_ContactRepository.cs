@@ -15,5 +15,12 @@ namespace Chat.Infra.Repositories
         {
             return _context.Set<UserContact>().Include(include => include.Contact).Where(where => where.UserId == userId).ToList();
         }
+
+        public bool RemoveUserContact(int userId, int contactId)
+        {
+            var entity = _context.Set<UserContact>().Where(where => where.UserId == userId && where.ContactId == contactId).FirstOrDefault();
+            _context.Set<UserContact>().Remove(entity);
+            return true;
+        }
     }
 }
