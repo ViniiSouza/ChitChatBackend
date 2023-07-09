@@ -15,5 +15,7 @@ namespace Chat.Domain.Interfaces.Repositories
         bool ExistsPrivateConversation(int firstUserId, int secondUserId);
 
         Conversation? GetById(int id, int userId);
+
+        Conversation? GetPrivateConversation(int firstUserId, int secondUserId);
     }
 }

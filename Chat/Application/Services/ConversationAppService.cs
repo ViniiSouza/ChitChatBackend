@@ -220,6 +220,36 @@ namespace Chat.Application.Services
             return result;
         }
 
+        public ConversationSimpleDTO GetSimplePrivate(string userName, string targetUserName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            var target = _unitOfWork.UserRepository.GetByUserName(targetUserName);
+
+            if (target == null)
+            {
+                throw new InvalidOperationException("User not found. Try again!");
+            }
+
+            var chat = _unitOfWork.ConversationRepository.GetPrivateConversation(user.Id, target.Id);
+
+            if (chat == null)
+            {
+                throw new InvalidOperationException("Chat not found. Try again!");
+            }
+
+            var dto = _mapper.Map<ConversationSimpleDTO>(chat);
+
+            dto.Title = target.Name; // it will be like this while there isn't the "conversation name" feature
+
+            return dto;
+        }
+
         private void SetMessagePermission(int firstUserId, int secondUserId)
         {
             if (!_unitOfWork.MessagePermissionRepository.CanUserMessage(firstUserId, secondUserId))
@@ -231,22 +261,6 @@ namespace Chat.Application.Services
             {
                 _unitOfWork.MessagePermissionRepository.Create(new MessagePermission(secondUserId, firstUserId));
             }
-        }
-
-        public List<UserSimpleDTO> GetContactsByUser(string userName)
-        {
-            var user = _unitOfWork.UserRepository.GetByUserName(userName);
-
-            if (user == null)
-            {
-                throw new InvalidOperationException("Invalid username. Try again!");
-            }
-
-            return _unitOfWork.User_ContactRepository.GetContactsByUserId(user.Id).Select(select => new UserSimpleDTO()
-            {
-                Id = select.ContactId,
-                UserName = select.Contact.Name
-            }).ToList();
         }
     }
 }

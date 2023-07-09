@@ -28,6 +28,7 @@
         None = 0,
         PublicProfile = 1,
         PrivateProfile = 2,
-        HasPermission = 3
+        HasPermission = 3,
+        AlreadyHasChat = 4
     }
 }

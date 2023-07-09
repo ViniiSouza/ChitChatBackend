@@ -82,7 +82,7 @@ namespace Chat.Application.Services
 
             if (_unitOfWork.MessagePermissionRepository.CanUserMessage(user.Id, target.Id))
             {
-                dto.Type = ESearchUserType.HasPermission;
+                dto.Type = _unitOfWork.ConversationRepository.ExistsPrivateConversation(user.Id, target.Id) ? ESearchUserType.AlreadyHasChat : ESearchUserType.HasPermission;
             }
             else
             {

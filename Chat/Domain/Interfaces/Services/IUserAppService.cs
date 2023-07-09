@@ -7,6 +7,11 @@ namespace Chat.Domain.Interfaces.Services
     {
         string? RequestMessage(string requesterUsername, string receiverUsername, string message);
 
+        /// <summary>
+        /// Get contacts by username
+        /// </summary>
+        /// <param name="userName">Token username</param>
+        /// <returns>The list of contacts of the user</returns>
         List<UserSimpleDTO> GetContactsByUser(string userName);
 
         bool RemoveContact(string userName, int targetContactId);

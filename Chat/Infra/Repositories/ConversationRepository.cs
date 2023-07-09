@@ -70,5 +70,12 @@ namespace Chat.Infra.Repositories
 
             return query.FirstOrDefault();
         }
+
+        public Conversation? GetPrivateConversation(int firstUserId, int secondUserId)
+        {
+            var query = _context.Set<Conversation>().AsNoTracking().Where(where => where.Participants.Any(any => any.UserId == firstUserId) && where.Participants.Any(any => any.UserId == secondUserId));
+
+            return query.FirstOrDefault();
+        }
     }
 }

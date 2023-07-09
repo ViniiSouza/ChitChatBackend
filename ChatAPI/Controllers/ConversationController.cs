@@ -56,11 +56,19 @@ namespace ChatAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("chat/{id}")]
+        [HttpGet("{id}")]
         public IActionResult GetConversation([FromRoute] int id)
         {
             var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
             var result = _appService.GetConversation(id, userName);
+            return Ok(result);
+        }
+
+        [HttpGet("simple/{targetUserName}")]
+        public IActionResult FindSimpleConversation([FromRoute] string targetUserName)
+        {
+            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            var result = _appService.GetSimplePrivate(userName, targetUserName);
             return Ok(result);
         }
     }

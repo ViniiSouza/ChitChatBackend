@@ -35,12 +35,13 @@ namespace Chat.Domain.Interfaces.Services
         /// <param name="username">Token username</param>
         /// <returns>A DTO of the conversation, with the last 20 messages</returns>
         ConversationDTO GetConversation(int conversationId, string username);
-        
+
         /// <summary>
-        /// Get contacts by username
+        /// Get private conversation, if exists, between <paramref name="userName"/> and <paramref name="targetUserName"/>
         /// </summary>
-        /// <param name="userName">Token username</param>
-        /// <returns>The list of contacts of the user</returns>
-        List<UserSimpleDTO> GetContactsByUser(string userName);
+        /// <param name="userName"></param>
+        /// <param name="targetUserName"></param>
+        /// <returns>A DTO of the conversation</returns>
+        ConversationSimpleDTO GetSimplePrivate(string userName, string targetUserName);
     }
 }
