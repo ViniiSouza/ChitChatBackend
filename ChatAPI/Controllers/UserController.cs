@@ -70,5 +70,20 @@ namespace ChatAPI.Controllers
             return Ok();
         }
 
+        [HttpGet("search")]
+        public IActionResult SearchUser([FromQuery] string username)
+        {
+            var requester = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            try
+            {
+                var result = _appService.SearchUser(requester, username);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

@@ -45,6 +45,7 @@ namespace Chat.Infra.Repositories
         public User? GetByUserName(string username)
         {
             var result = _context.Set<User>().AsNoTracking().Where(where => where.UserName == username.ToLower()).FirstOrDefault();
+            if (result == null) return null;
             result.Password = null;
             return result;
         }

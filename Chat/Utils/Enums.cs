@@ -22,4 +22,12 @@
         Self = 1,
         Other = 2
     }
+
+    public enum ESearchUserType
+    {
+        None = 0,
+        PublicProfile = 1,
+        PrivateProfile = 2,
+        HasPermission = 3
+    }
 }

@@ -10,5 +10,7 @@ namespace Chat.Domain.Interfaces.Services
         List<UserSimpleDTO> GetContactsByUser(string userName);
 
         bool RemoveContact(string userName, int targetContactId);
+
+        UserSearchDTO SearchUser(string requester, string targetUser);
     }
 }

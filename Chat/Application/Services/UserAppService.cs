@@ -3,6 +3,7 @@ using Chat.Application.DTOs;
 using Chat.Domain.Interfaces.Services;
 using Chat.Domain.Models;
 using Chat.Infra.Data;
+using Chat.Utils.Enums;
 
 namespace Chat.Application.Services
 {
@@ -54,6 +55,41 @@ namespace Chat.Application.Services
             var result = _unitOfWork.User_ContactRepository.RemoveUserContact(user.Id, targetContactId);
             _unitOfWork.Save();
             return result;
+        }
+
+        public UserSearchDTO SearchUser(string requester, string targetUser)
+        {
+            if (requester == targetUser)
+            {
+                throw new InvalidOperationException("You cannot invite yourself!");
+            }
+
+            var user = _unitOfWork.UserRepository.GetByUserName(requester);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            var target = _unitOfWork.UserRepository.GetByUserName(targetUser);
+
+            if (target == null)
+            {
+                throw new InvalidOperationException("User not found!");
+            }
+
+            var dto = _mapper.Map<UserSearchDTO>(target);
+
+            if (_unitOfWork.MessagePermissionRepository.CanUserMessage(user.Id, target.Id))
+            {
+                dto.Type = ESearchUserType.HasPermission;
+            }
+            else
+            {
+               dto.Type = target.IsPublicProfile ? ESearchUserType.PublicProfile : ESearchUserType.PrivateProfile;
+            }
+
+            return dto;
         }
     }
 }
