@@ -84,9 +84,14 @@ namespace Chat.Application.Services
             {
                 dto.Type = _unitOfWork.ConversationRepository.ExistsPrivateConversation(user.Id, target.Id) ? ESearchUserType.AlreadyHasChat : ESearchUserType.HasPermission;
             }
+            else if (target.IsPublicProfile)
+            {
+                dto.Type = ESearchUserType.PublicProfile;
+                
+            }
             else
             {
-               dto.Type = target.IsPublicProfile ? ESearchUserType.PublicProfile : ESearchUserType.PrivateProfile;
+                dto.Type = _unitOfWork.MessageRequestRepository.ExistsRequest(user.Id, target.Id) ? ESearchUserType.AlreadySentInvite : ESearchUserType.PrivateProfile;
             }
 
             return dto;

@@ -29,6 +29,7 @@
         PublicProfile = 1,
         PrivateProfile = 2,
         HasPermission = 3,
-        AlreadyHasChat = 4
+        AlreadyHasChat = 4,
+        AlreadySentInvite = 5,
     }
 }
