@@ -27,7 +27,7 @@ namespace Chat.Application.Services
             return null;
         }
 
-        public List<UserSimpleDTO> GetContactsByUser(string userName)
+        public List<ContactDTO> GetContactsByUser(string userName)
         {
             var user = _unitOfWork.UserRepository.GetByUserName(userName);
 
@@ -36,10 +36,11 @@ namespace Chat.Application.Services
                 throw new InvalidOperationException("Invalid username. Try again!");
             }
 
-            return _unitOfWork.User_ContactRepository.GetContactsByUserId(user.Id).Select(select => new UserSimpleDTO()
+            return _unitOfWork.User_ContactRepository.GetContactsByUserId(user.Id).Select(select => new ContactDTO()
             {
                 Id = select.ContactId,
-                UserName = select.Contact.Name
+                Name = select.Contact.Name,
+                UserName = select.Contact.UserName
             }).ToList();
         }
 

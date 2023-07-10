@@ -55,6 +55,8 @@ namespace ChatAPI.Controllers
         {
             var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
             var result = _appService.GetSimplePrivate(userName, targetUserName);
+            if (result == null) return NotFound("Chat not found!");
+
             return Ok(result);
         }
     }

@@ -42,6 +42,6 @@ namespace Chat.Domain.Interfaces.Services
         /// <param name="userName"></param>
         /// <param name="targetUserName"></param>
         /// <returns>A DTO of the conversation</returns>
-        ConversationSimpleDTO GetSimplePrivate(string userName, string targetUserName);
+        ConversationSimpleDTO? GetSimplePrivate(string userName, string targetUserName);
     }
 }

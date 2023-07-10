@@ -220,7 +220,7 @@ namespace Chat.Application.Services
             return result;
         }
 
-        public ConversationSimpleDTO GetSimplePrivate(string userName, string targetUserName)
+        public ConversationSimpleDTO? GetSimplePrivate(string userName, string targetUserName)
         {
             var user = _unitOfWork.UserRepository.GetByUserName(userName);
 
@@ -240,7 +240,7 @@ namespace Chat.Application.Services
 
             if (chat == null)
             {
-                throw new InvalidOperationException("Chat not found. Try again!");
+                return null;
             }
 
             var dto = _mapper.Map<ConversationSimpleDTO>(chat);
