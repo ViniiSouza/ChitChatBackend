@@ -13,16 +13,16 @@ namespace Chat.Application.Services
         {
         }
 
-        public string? RequestMessage(string requesterUsername, string receiverUsername, string message)
+        public string? RequestMessage(string requesterUsername, MessagePermissionCreateDTO dto)
         {
             var requester = _unitOfWork.UserRepository.GetByUserName(requesterUsername);
-            var receiver = _unitOfWork.UserRepository.GetByUserName(receiverUsername);
+            var receiver = _unitOfWork.UserRepository.GetByUserName(dto.Receiver);
             if (_unitOfWork.MessageRequestRepository.ExistsRequest(requester.Id, receiver.Id))
             {
                 return "A message request already exists for this user!";
             }
 
-            _unitOfWork.MessageRequestRepository.CreateRequest(requester.Id, receiver.Id, message);
+            _unitOfWork.MessageRequestRepository.CreateRequest(requester.Id, receiver.Id, dto.Message);
             _unitOfWork.Save();
             return null;
         }

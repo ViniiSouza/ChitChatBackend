@@ -11,25 +11,11 @@ namespace ChatAPI.Controllers
     [Route("[controller]")]
     public class ConversationController : ControllerBase
     {
-        private readonly IUserAppService _userAppService;
         private readonly IConversationAppService _appService;
 
         public ConversationController(IUserAppService userAppService, IConversationAppService appService)
         {
-            _userAppService = userAppService;
             _appService = appService;
-        }
-
-        [HttpPost("request")]
-        public IActionResult RequestMessage([FromQuery] string requester, [FromQuery] string receiver, [FromQuery] string message)
-        {
-            var response = _userAppService.RequestMessage(requester, receiver, message);
-            if (response != null)
-            {
-                return Conflict(response);
-            }
-
-            return StatusCode(201);
         }
 
         [HttpPost("create")]
@@ -41,7 +27,7 @@ namespace ChatAPI.Controllers
         }
 
         [HttpPost("accept-request")]
-        public IActionResult CreateConversation([FromQuery] int requestId)
+        public IActionResult CreateConversationFromRequest([FromQuery] int requestId)
         {
             var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
             var result = _appService.CreatePrivateByRequest(requestId, userName);

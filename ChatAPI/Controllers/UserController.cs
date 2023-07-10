@@ -1,4 +1,5 @@
-﻿using Chat.Domain.Interfaces.Services;
+﻿using Chat.Application.DTOs;
+using Chat.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -39,11 +40,11 @@ namespace ChatAPI.Controllers
             return Ok(result);
         }
 
-        #region Message request
         [HttpPost("request")]
-        public IActionResult RequestMessage([FromQuery] string requester, [FromQuery] string receiver, [FromQuery] string message)
+        public IActionResult RequestMessage([FromBody] MessagePermissionCreateDTO dto)
         {
-            var response = _appService.RequestMessage(requester, receiver, message);
+            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            var response = _appService.RequestMessage(userName, dto);
             if (response != null)
             {
                 return Conflict(response);
@@ -51,8 +52,6 @@ namespace ChatAPI.Controllers
 
             return StatusCode(201);
         }
-
-        #endregion
 
         [HttpGet("contacts")]
         public IActionResult GetContacts()

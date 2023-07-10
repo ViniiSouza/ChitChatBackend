@@ -5,7 +5,7 @@ namespace Chat.Domain.Interfaces.Services
 {
     public interface IUserAppService : IBaseAppService<UserDTO, User>
     {
-        string? RequestMessage(string requesterUsername, string receiverUsername, string message);
+        string? RequestMessage(string requesterUsername, MessagePermissionCreateDTO dto);
 
         /// <summary>
         /// Get contacts by username
