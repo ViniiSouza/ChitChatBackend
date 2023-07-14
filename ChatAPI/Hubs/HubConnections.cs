@@ -6,22 +6,17 @@
 
         public static bool UserHasConnection(string userId, string connectionId)
         {
-            if (OnlineUsers.ContainsKey(userId))
-            {
-                return OnlineUsers[userId].Any(any => any.Contains(connectionId));
-            }
-
-            return false;
+            return OnlineUsers.ContainsKey(userId) && OnlineUsers[userId].Any(any => any.Contains(connectionId));
         }
 
         public static bool HasUser(string userId)
         {
-            if (OnlineUsers.ContainsKey(userId))
-            {
-                return OnlineUsers[userId].Any();
-            }
+            return OnlineUsers.ContainsKey(userId) && OnlineUsers[userId].Any();
+        }
 
-            return false;
+        public static bool UserHasConnectionLimit(string userId)
+        {
+            return HasUser(userId) && OnlineUsers[userId].Count >= 3;
         }
 
         public static void AddUserConnection(string userId, string connectionId)

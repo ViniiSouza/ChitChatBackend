@@ -14,6 +14,11 @@ namespace ChatAPI.Hubs
 
             var userIdentifier = Context.User.FindFirstValue(ClaimTypes.Name);
 
+            if (HubConnections.UserHasConnectionLimit(userIdentifier))
+            {
+                throw new HubException("User concurrent connections limit exceeded");
+            }
+
             HubConnections.AddUserConnection(userIdentifier, Context.ConnectionId);
 
             // invoke "online status" to the listeners of user
