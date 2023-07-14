@@ -1,22 +1,36 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 
 namespace ChatAPI.Hubs
 {
     public class ChatHub : Hub
     {
-        public string GetConnectionId() => Context.ConnectionId;
-
-        /// <summary>
-        /// Invoked when a user send a message. Invoke a "ReceiveMessage" that send all the informations to reproduce it
-        /// </summary>
-        /// <param name="sender">Sender</param>
-        /// <param name="message">Message content</param>
-        /// <param name="receiver">Receiver</param>
-        /// <param name="time">Hours and minutes the message was sent</param>
-        public async Task SendMessage(string sender, string message, string receiver, string time)
+        public override Task OnConnectedAsync()
         {
-            var data = DateTime.Now;
-            await Clients.All.SendAsync("ReceiveMessage", sender, message, receiver, time);
+            if (Context.User == null || !Context.User.Claims.Any() || !Context.User.HasClaim(any => any.Type == ClaimTypes.Name))
+            {
+                throw new HubException("Unauthorized connection");
+            }
+
+            var userIdentifier = Context.User.FindFirstValue(ClaimTypes.Name);
+
+            HubConnections.AddUserConnection(userIdentifier, Context.ConnectionId);
+
+            // invoke "online status" to the listeners of user
+
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            var userIdentifier = Context.User.FindFirstValue(ClaimTypes.Name);
+
+            HubConnections.RemoveUserConnection(userIdentifier, Context.ConnectionId);
+
+            // invoke "offline status" to the listeners of user
+            // delete the group of listeners after it
+
+            return base.OnDisconnectedAsync(exception);
         }
     }
 }
