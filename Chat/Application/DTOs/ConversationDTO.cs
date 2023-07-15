@@ -1,10 +1,11 @@
-﻿using Chat.Domain.Models;
-using Chat.Utils.Enums;
+﻿using Chat.Utils.Enums;
 
 namespace Chat.Application.DTOs
 {
     public class ConversationDTO
     {
+        public int Id { get; set; }
+
         public EChatType Type { get; set; }
 
         public List<UserDTO> Participants { get; set; }

@@ -23,7 +23,7 @@ namespace ChatAPI.Controllers
         {
             var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
             var result = _appService.CreateAllowedPrivate(dto, userName);
-            return Ok(result);
+            return StatusCode(201, result);
         }
 
         [HttpPost("accept-request")]
@@ -58,6 +58,14 @@ namespace ChatAPI.Controllers
             if (result == null) return NotFound("Chat not found!");
 
             return Ok(result);
+        }
+
+        [HttpPost("message")]
+        public IActionResult SendMessage([FromBody] MessageCreateDTO dto)
+        {
+            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            var result = _appService.SendMessage(dto, userName);
+            return StatusCode(201, result);
         }
     }
 }

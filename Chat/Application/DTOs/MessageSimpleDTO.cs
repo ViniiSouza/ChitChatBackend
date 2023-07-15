@@ -4,6 +4,7 @@ namespace Chat.Application.DTOs
 {
     public class MessageSimpleDTO
     {
+        public int Id { get; set; }
         public string Content { get; set; }
 
         public string SenderName { get; set; }

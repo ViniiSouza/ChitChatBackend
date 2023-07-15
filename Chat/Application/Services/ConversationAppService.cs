@@ -19,7 +19,7 @@ namespace Chat.Application.Services
             var conversations = _unitOfWork.ConversationRepository.GetAllSimpleByUser(user.Id).Select(select => new ConversationSimpleDTO()
             {
                 Id = select.Id,
-                Title = select.Participants.FirstOrDefault(where => where.UserId != user.Id).User.Name, // this will change when implemented group chats
+                Title = select.Participants.FirstOrDefault(where => where.UserId != user.Id)?.User?.Name, // this will change when implemented group chats
                 LastMessage = _mapper.Map<MessageSimpleDTO>(select.LastMessage, opt => opt.AfterMap((src, dest) => {
                     if (dest is not null
                         && select is not null
@@ -216,6 +216,7 @@ namespace Chat.Application.Services
             result.LastMessage.OwnMessage = true;
             result.LastMessage.SenderName = creator.Name;
             result.Id = conversation.Id;
+            result.Title = receiver.Name;
 
             return result;
         }
@@ -261,6 +262,40 @@ namespace Chat.Application.Services
             {
                 _unitOfWork.MessagePermissionRepository.Create(new MessagePermission(secondUserId, firstUserId));
             }
+        }
+
+        public MessageSimpleDTO SendMessage(MessageCreateDTO dto, string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            var conversation = _unitOfWork.ConversationRepository.GetById(dto.ConversationId, user.Id);
+
+            if (conversation == null)
+            {
+                throw new InvalidOperationException("Conversation not found!");
+            }
+
+            var entity = _mapper.Map<Message>(dto);
+
+            entity.ChatId = conversation.Id;
+            entity.SenderId = user.Id;
+
+            _unitOfWork.MessageRepository.Create(entity); // create a specific create for messages that updates this message as the last message
+            _unitOfWork.Save();
+
+            return new MessageSimpleDTO()
+            {
+                Id = entity.Id,
+                Content = dto.Content,
+                OwnMessage = true,
+                SenderName = user.Name,
+                SendingTime = dto.SendingTime,
+            };
         }
     }
 }
