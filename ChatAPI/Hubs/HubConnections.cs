@@ -40,6 +40,15 @@
             return OnlineUsers.Keys.ToList();
         }
 
+        public static List<string>? GetConnectionsByUser(string userId)
+        {
+            if (OnlineUsers.ContainsKey(userId))
+            {
+                return OnlineUsers[userId].ToList();
+            }
+            return null;
+        }
+
         private static void AddToDictionary(string key, string value)
         {
             if (OnlineUsers.ContainsKey(key))

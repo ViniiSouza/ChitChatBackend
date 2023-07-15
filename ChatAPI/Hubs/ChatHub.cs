@@ -1,10 +1,19 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Chat.Application.DTOs;
+using Chat.Domain.Interfaces.Services;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace ChatAPI.Hubs
 {
     public class ChatHub : Hub
     {
+        private readonly IConversationAppService _appService;
+
+        public ChatHub(IConversationAppService appService)
+        {
+            _appService = appService;
+        }
+
         public override Task OnConnectedAsync()
         {
             if (Context.User == null || !Context.User.Claims.Any() || !Context.User.HasClaim(any => any.Type == ClaimTypes.Name))
@@ -12,7 +21,7 @@ namespace ChatAPI.Hubs
                 throw new HubException("Unauthorized connection");
             }
 
-            var userIdentifier = Context.User.FindFirstValue(ClaimTypes.Name);
+            var userIdentifier = GetUserIdentifier();
 
             if (HubConnections.UserHasConnectionLimit(userIdentifier))
             {
@@ -28,7 +37,7 @@ namespace ChatAPI.Hubs
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            var userIdentifier = Context.User.FindFirstValue(ClaimTypes.Name);
+            var userIdentifier = GetUserIdentifier();
 
             HubConnections.RemoveUserConnection(userIdentifier, Context.ConnectionId);
 
@@ -36,6 +45,23 @@ namespace ChatAPI.Hubs
             // delete the group of listeners after it
 
             return base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task<MessageSimpleDTO> SendMessage(MessageCreateDTO dto)
+        {
+            var result = _appService.SendMessage(dto, GetUserIdentifier());
+            return result;
+        }
+
+        public async Task<ConversationSimpleDTO> CreateConversation(ConversationCreateDTO dto)
+        {
+            var result = _appService.CreateAllowedPrivate(dto, GetUserIdentifier());
+            return result;
+        }
+
+        private string GetUserIdentifier()
+        {
+            return Context.User.FindFirstValue(ClaimTypes.Name);
         }
     }
 }
