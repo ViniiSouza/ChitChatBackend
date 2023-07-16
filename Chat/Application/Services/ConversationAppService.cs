@@ -292,6 +292,9 @@ namespace Chat.Application.Services
             _unitOfWork.MessageRepository.Create(entity); // create a specific create for messages that updates this message as the last message
             _unitOfWork.Save();
 
+            _unitOfWork.ConversationRepository.UpdateLastMessage(conversation.Id, entity.Id);
+            _unitOfWork.Save();
+
             var messageDto = new MessageSimpleDTO()
             {
                 Id = entity.Id,
