@@ -1,7 +1,7 @@
 using AutoMapper;
+using Chat.Hubs;
 using Chat.Infra.Contexts;
 using Chat.Security;
-using ChatAPI.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;

@@ -1,4 +1,4 @@
-﻿namespace ChatAPI.Hubs
+﻿namespace Chat.Hubs
 {
     public static class HubConnections
     {

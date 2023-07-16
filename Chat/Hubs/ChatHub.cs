@@ -3,15 +3,17 @@ using Chat.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
-namespace ChatAPI.Hubs
+namespace Chat.Hubs
 {
     public class ChatHub : Hub
     {
         private readonly IConversationAppService _appService;
+        private readonly IUserAppService _userAppService;
 
-        public ChatHub(IConversationAppService appService)
+        public ChatHub(IConversationAppService appService, IUserAppService userAppService)
         {
             _appService = appService;
+            _userAppService = userAppService;
         }
 
         public override Task OnConnectedAsync()
@@ -45,6 +47,11 @@ namespace ChatAPI.Hubs
             // delete the group of listeners after it
 
             return base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task<bool> IsUserOnline(string userName)
+        {
+            return HubConnections.HasUser(userName);
         }
 
         public async Task<MessageSimpleDTO> SendMessage(MessageCreateDTO dto)
