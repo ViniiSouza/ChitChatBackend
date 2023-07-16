@@ -77,5 +77,12 @@ namespace Chat.Infra.Repositories
 
             return query.FirstOrDefault();
         }
+
+        public List<User> GetUsersFromConversation(int conversationId)
+        {
+            var query = _context.Set<User>().Where(where => where.Conversations.Any(any => any.ConversationId == conversationId));
+
+            return query.ToList();
+        }
     }
 }

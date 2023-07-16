@@ -13,6 +13,18 @@ namespace Chat.Application.Services
         {
         }
 
+        public UserDTO GetUserByUserName(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            return _mapper.Map<UserDTO>(user);
+        }
+
         public string? RequestMessage(string requesterUsername, MessagePermissionCreateDTO dto)
         {
             var requester = _unitOfWork.UserRepository.GetByUserName(requesterUsername);

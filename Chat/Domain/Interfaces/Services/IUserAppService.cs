@@ -5,6 +5,8 @@ namespace Chat.Domain.Interfaces.Services
 {
     public interface IUserAppService : IBaseAppService<UserDTO, User>
     {
+        UserDTO GetUserByUserName(string userName);
+
         string? RequestMessage(string requesterUsername, MessagePermissionCreateDTO dto);
 
         /// <summary>

@@ -2,15 +2,19 @@
 using Chat.Application.DTOs;
 using Chat.Domain.Interfaces.Services;
 using Chat.Domain.Models;
+using Chat.Hubs;
 using Chat.Infra.Data;
 using Chat.Utils.Enums;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Chat.Application.Services
 {
     public class ConversationAppService : BaseAppService<ConversationDTO, Conversation>, IConversationAppService
     {
-        public ConversationAppService(IMapper mapper, UnitOfWork unitOfWork) : base(mapper, unitOfWork)
+        private readonly IHubContext<ChatHub> _chatHub;
+        public ConversationAppService(IMapper mapper, UnitOfWork unitOfWork, IHubContext<ChatHub> chatHub) : base(mapper, unitOfWork)
         {
+            _chatHub = chatHub;
         }
 
         public List<ConversationSimpleDTO> LoadConversationsByUser(string username)
@@ -288,14 +292,36 @@ namespace Chat.Application.Services
             _unitOfWork.MessageRepository.Create(entity); // create a specific create for messages that updates this message as the last message
             _unitOfWork.Save();
 
-            return new MessageSimpleDTO()
+            var messageDto = new MessageSimpleDTO()
             {
                 Id = entity.Id,
                 Content = dto.Content,
+                ConversationId = conversation.Id,
                 OwnMessage = true,
                 SenderName = user.Name,
                 SendingTime = dto.SendingTime,
             };
+
+            AlertMessage(messageDto, conversation.Id, user.Id);
+            messageDto.OwnMessage = true;
+
+            return messageDto;
+        }
+
+        private void AlertMessage(MessageSimpleDTO message, int conversationId, int senderId)
+        {
+            var conversationUsers = _unitOfWork.ConversationRepository.GetUsersFromConversation(conversationId).Where(where => where.Id != senderId).Select(select => select.UserName);
+
+            List<string> receiversIds = new List<string>();
+
+            foreach (var user in conversationUsers)
+            {
+                if (HubConnections.HasUser(user))
+                    receiversIds.AddRange(HubConnections.GetConnectionsByUser(user));
+            }
+
+            message.OwnMessage = false;
+            _chatHub.Clients.Clients(receiversIds).SendAsync("MessageReceived", message);
         }
     }
 }

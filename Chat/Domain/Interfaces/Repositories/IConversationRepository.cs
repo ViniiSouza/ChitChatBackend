@@ -17,5 +17,7 @@ namespace Chat.Domain.Interfaces.Repositories
         Conversation? GetById(int id, int userId);
 
         Conversation? GetPrivateConversation(int firstUserId, int secondUserId);
+
+        List<User> GetUsersFromConversation(int conversationId);
     }
 }
