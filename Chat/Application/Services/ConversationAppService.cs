@@ -298,6 +298,7 @@ namespace Chat.Application.Services
             var messageDto = new MessageSimpleDTO()
             {
                 Id = entity.Id,
+                Action = dto.Action,
                 Content = dto.Content,
                 ConversationId = conversation.Id,
                 OwnMessage = true,
