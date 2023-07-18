@@ -16,6 +16,8 @@
 
         public DateTime LastLogin { get; set; }
 
+        public DateTime? LastSeen { get; set; }
+
         public List<Message> MessagesSent { get; set; }
 
         public List<UserContact> Contacts { get; set; }
