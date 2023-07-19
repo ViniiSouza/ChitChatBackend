@@ -9,5 +9,7 @@
         public string Name { get; set; }
 
         public string Password { get; set; }
+
+        public DateTime LastSeen { get; set; }
     }
 }

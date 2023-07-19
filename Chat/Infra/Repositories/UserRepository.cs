@@ -57,5 +57,13 @@ namespace Chat.Infra.Repositories
             _context.Attach(entity);
             _context.Entry(entity).Property(p => p.LastLogin).IsModified = true;
         }
+
+        public void SetLastSeen(string username, DateTime date)
+        {
+            var entity = GetByUserName(username);
+            entity.LastSeen = date;
+            _context.Attach(entity);
+            _context.Entry(entity).Property(p => p.LastSeen).IsModified = true;
+        }
     }
 }

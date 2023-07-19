@@ -19,5 +19,9 @@ namespace Chat.Domain.Interfaces.Services
         bool RemoveContact(string userName, int targetContactId);
 
         UserSearchDTO SearchUser(string requester, string targetUser);
+
+        DateTime GetUserLastLogin(string userName);
+
+        void UpdateUserLastSeen(string userName, DateTime date);
     }
 }

@@ -312,6 +312,17 @@ namespace Chat.Application.Services
             return messageDto;
         }
 
+        public string GetUserFromPrivate(int conversationId, string callerUserName)
+        {
+            var resultUser = _unitOfWork.ConversationRepository.GetUsersFromConversation(conversationId).Where(where => where.UserName != callerUserName).FirstOrDefault();
+            if (resultUser == null)
+            {
+                throw new InvalidOperationException("User not found. Try again!");
+            }
+
+            return resultUser.UserName;
+        }
+
         private void AlertMessage(MessageSimpleDTO message, int conversationId, int senderId)
         {
             var conversationUsers = _unitOfWork.ConversationRepository.GetUsersFromConversation(conversationId).Where(where => where.Id != senderId).Select(select => select.UserName);

@@ -32,4 +32,11 @@
         AlreadyHasChat = 4,
         AlreadySentInvite = 5,
     }
+
+    public enum EStatus
+    {
+        None = 0,
+        Online = 1,
+        Offline = 2
+    }
 }

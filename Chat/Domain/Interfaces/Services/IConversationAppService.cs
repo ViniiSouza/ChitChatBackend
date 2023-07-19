@@ -45,5 +45,7 @@ namespace Chat.Domain.Interfaces.Services
         ConversationSimpleDTO? GetSimplePrivate(string userName, string targetUserName);
 
         MessageSimpleDTO SendMessage(MessageCreateDTO dto, string userName);
+
+        string GetUserFromPrivate(int conversationId, string callerUserName);
     }
 }

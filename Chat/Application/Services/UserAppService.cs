@@ -109,5 +109,22 @@ namespace Chat.Application.Services
 
             return dto;
         }
+
+        public void UpdateUserLastSeen(string userName, DateTime date)
+        {
+            _unitOfWork.UserRepository.SetLastSeen(userName, date);
+            _unitOfWork.Save();
+        }
+
+        public DateTime GetUserLastLogin(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            return user.LastLogin;
+        }
     }
 }
