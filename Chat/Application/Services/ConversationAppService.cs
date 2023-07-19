@@ -314,7 +314,7 @@ namespace Chat.Application.Services
 
         public string GetUserFromPrivate(int conversationId, string callerUserName)
         {
-            var resultUser = _unitOfWork.ConversationRepository.GetUsersFromConversation(conversationId).Where(where => where.UserName != callerUserName).FirstOrDefault();
+            var resultUser = _unitOfWork.ConversationRepository.GetUsersFromConversation(conversationId).Where(where => where.UserName.ToUpper() != callerUserName.ToUpper()).FirstOrDefault();
             if (resultUser == null)
             {
                 throw new InvalidOperationException("User not found. Try again!");
