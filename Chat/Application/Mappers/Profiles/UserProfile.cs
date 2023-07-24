@@ -12,6 +12,7 @@ namespace Chat.Application.Mappers.Profiles
             CreateMap<UserDTO, User>().ReverseMap();
             CreateMap<UserLoginDTO, User>();
             CreateMap<User, UserSearchDTO>().ForMember(dest => dest.Type, opt => opt.Ignore());
+            CreateMap<User, UserSimpleDTO>();
         }
     }
 }

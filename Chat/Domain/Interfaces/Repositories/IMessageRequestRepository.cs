@@ -7,5 +7,7 @@ namespace Chat.Domain.Interfaces.Repositories
         bool ExistsRequest(int requesterId, int receiverId);
 
         void CreateRequest(int requesterId, int receiverId, string? message);
+
+        List<MessageRequest> GetRequestsByUser(int userId);
     }
 }

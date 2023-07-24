@@ -84,5 +84,13 @@ namespace ChatAPI.Controllers
             }
         }
 
+        [HttpGet("request/all")]
+        public IActionResult GetRequestsByUser()
+        {
+            var requester = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            var result = _appService.GetRequestsByUser(requester);
+
+            return Ok(result);
+        }
     }
 }

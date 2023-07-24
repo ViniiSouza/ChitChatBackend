@@ -21,6 +21,8 @@ namespace Chat.Application.Mappers.Profiles
             CreateMap<MessageCreateDTO, Message>()
                 .ForMember(dest => dest.ChatId, opt => opt.Ignore())
                 .ForMember(dest => dest.CreationDate, opt => opt.MapFrom(from => from.SendingTime));
+
+            CreateMap<MessageRequest, MessageRequestDTO>().ForMember(dest => dest.Message, opt => opt.MapFrom(from => from.CustomInvite));
         }
     }
 }

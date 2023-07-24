@@ -23,5 +23,7 @@ namespace Chat.Domain.Interfaces.Services
         DateTime GetUserLastLogin(string userName);
 
         void UpdateUserLastSeen(string userName, DateTime date);
+
+        List<MessageRequestDTO> GetRequestsByUser(string userName);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Chat.Domain.Interfaces.Repositories;
 using Chat.Domain.Models;
 using Chat.Infra.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chat.Infra.Repositories
 {
@@ -24,6 +25,11 @@ namespace Chat.Infra.Repositories
             var entity = new MessageRequest(requesterId, receiverId, message);
             entity.CreationDate = DateTime.Now;
             _context.Set<MessageRequest>().Add(entity);
+        }
+
+        public List<MessageRequest> GetRequestsByUser(int userId)
+        {
+            return _context.Set<MessageRequest>().Include(include => include.Requester).Where(where => where.ReceiverId == userId).ToList();
         }
     }
 }

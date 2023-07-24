@@ -126,5 +126,18 @@ namespace Chat.Application.Services
 
             return user.LastLogin;
         }
+
+        public List<MessageRequestDTO> GetRequestsByUser(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            var requests = _unitOfWork.MessageRequestRepository.GetRequestsByUser(user.Id);
+
+            return _mapper.Map<List<MessageRequestDTO>>(requests);
+        }
     }
 }
