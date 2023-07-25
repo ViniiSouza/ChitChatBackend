@@ -135,6 +135,8 @@ namespace Chat.Application.Services
 
             conversation.LastMessage = firstMessage;
 
+            conversation.Title = requester.Name;
+
             var result = _mapper.Map<ConversationSimpleDTO>(conversation);
 
             result.LastMessage.OwnMessage = false;
