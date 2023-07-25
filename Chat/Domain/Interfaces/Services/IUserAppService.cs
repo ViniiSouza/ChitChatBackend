@@ -25,5 +25,7 @@ namespace Chat.Domain.Interfaces.Services
         void UpdateUserLastSeen(string userName, DateTime date);
 
         List<MessageRequestDTO> GetRequestsByUser(string userName);
+
+        void RefuseRequest(string userName, int requestId);
     }
 }

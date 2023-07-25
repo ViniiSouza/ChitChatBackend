@@ -92,5 +92,13 @@ namespace ChatAPI.Controllers
 
             return Ok(result);
         }
+
+        [HttpDelete("request")]
+        public IActionResult RefuseRequest([FromQuery] int requestId)
+        {
+            var user = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+            _appService.RefuseRequest(user, requestId);
+            return Ok();
+        }
     }
 }

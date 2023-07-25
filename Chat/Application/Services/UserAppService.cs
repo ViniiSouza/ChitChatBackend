@@ -139,5 +139,27 @@ namespace Chat.Application.Services
 
             return _mapper.Map<List<MessageRequestDTO>>(requests);
         }
+
+        public void RefuseRequest(string userName, int requestId)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+            var request = _unitOfWork.MessageRequestRepository.GetById(requestId);
+            if (request == null)
+            {
+                throw new InvalidOperationException("Request not found!");
+            }
+
+            if (request.ReceiverId != user.Id)
+            {
+                throw new InvalidOperationException("You can't refuse this request!");
+            }
+
+            _unitOfWork.MessageRequestRepository.Delete(request);
+            _unitOfWork.Save();
+        }
     }
 }
