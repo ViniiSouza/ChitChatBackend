@@ -43,8 +43,7 @@ namespace ChatAPI.Controllers
         [HttpPost("request")]
         public IActionResult RequestMessage([FromBody] MessagePermissionCreateDTO dto)
         {
-            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
-            var response = _appService.RequestMessage(userName, dto);
+            var response = _appService.RequestMessage(GetUserNameFromRequest(), dto);
             if (response != null)
             {
                 return Conflict(response);
@@ -56,26 +55,23 @@ namespace ChatAPI.Controllers
         [HttpGet("contacts")]
         public IActionResult GetContacts()
         {
-            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
-            var result = _appService.GetContactsByUser(userName);
+            var result = _appService.GetContactsByUser(GetUserNameFromRequest());
             return Ok(result);
         }
 
         [HttpDelete("contacts/{id}")]
         public IActionResult RemoveContact([FromRoute] int id)
         {
-            var userName = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
-            _appService.RemoveContact(userName, id);
+            _appService.RemoveContact(GetUserNameFromRequest(), id);
             return Ok();
         }
 
         [HttpGet("search")]
         public IActionResult SearchUser([FromQuery] string username)
         {
-            var requester = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
             try
             {
-                var result = _appService.SearchUser(requester, username);
+                var result = _appService.SearchUser(GetUserNameFromRequest(), username);
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
@@ -87,8 +83,7 @@ namespace ChatAPI.Controllers
         [HttpGet("request/all")]
         public IActionResult GetRequestsByUser()
         {
-            var requester = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
-            var result = _appService.GetRequestsByUser(requester);
+            var result = _appService.GetRequestsByUser(GetUserNameFromRequest());
 
             return Ok(result);
         }
@@ -96,9 +91,13 @@ namespace ChatAPI.Controllers
         [HttpDelete("request")]
         public IActionResult RefuseRequest([FromQuery] int requestId)
         {
-            var user = (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
-            _appService.RefuseRequest(user, requestId);
+            _appService.RefuseRequest(GetUserNameFromRequest(), requestId);
             return Ok();
+        }
+
+        private string GetUserNameFromRequest()
+        {
+            return (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
         }
     }
 }
