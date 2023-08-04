@@ -2,15 +2,20 @@
 using Chat.Application.DTOs;
 using Chat.Domain.Interfaces.Services;
 using Chat.Domain.Models;
+using Chat.Hubs;
 using Chat.Infra.Data;
 using Chat.Utils.Enums;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Chat.Application.Services
 {
     public class UserAppService : BaseAppService<UserDTO, User>, IUserAppService
     {
-        public UserAppService(IMapper mapper, UnitOfWork unitOfWork) : base(mapper, unitOfWork)
+        private readonly IHubContext<ChatHub> _chatHub;
+
+        public UserAppService(IMapper mapper, UnitOfWork unitOfWork, IHubContext<ChatHub> chatHub) : base(mapper, unitOfWork)
         {
+            _chatHub = chatHub;
         }
 
         public UserDTO GetUserByUserName(string userName)
@@ -28,7 +33,11 @@ namespace Chat.Application.Services
         public string? RequestMessage(string requesterUsername, MessagePermissionCreateDTO dto)
         {
             var requester = _unitOfWork.UserRepository.GetByUserName(requesterUsername);
+            if (requester == null)
+                throw new InvalidOperationException("Invalid username. Try again!");
             var receiver = _unitOfWork.UserRepository.GetByUserName(dto.Receiver);
+            if (receiver == null)
+                throw new InvalidOperationException("Invalid username. Try again!");
             if (_unitOfWork.MessageRequestRepository.ExistsRequest(requester.Id, receiver.Id))
             {
                 return "A message request already exists for this user!";
@@ -36,6 +45,9 @@ namespace Chat.Application.Services
 
             _unitOfWork.MessageRequestRepository.CreateRequest(requester.Id, receiver.Id, dto.Message);
             _unitOfWork.Save();
+
+            _chatHub.Clients.Client(dto.Receiver).SendAsync("RequestReceived");
+
             return null;
         }
 
@@ -112,8 +124,12 @@ namespace Chat.Application.Services
 
         public void UpdateUserLastSeen(string userName, DateTime date)
         {
-            _unitOfWork.UserRepository.SetLastSeen(userName, date);
-            _unitOfWork.Save();
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+            if (user != null)
+            {
+                _unitOfWork.UserRepository.SetLastSeen(userName, date);
+                _unitOfWork.Save();
+            }
         }
 
         public DateTime GetUserLastLogin(string userName)

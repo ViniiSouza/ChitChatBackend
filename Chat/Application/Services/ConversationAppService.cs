@@ -20,6 +20,10 @@ namespace Chat.Application.Services
         public List<ConversationSimpleDTO> LoadConversationsByUser(string username)
         {
             var user = _unitOfWork.UserRepository.GetByUserName(username);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
             var conversations = _unitOfWork.ConversationRepository.GetAllSimpleByUser(user.Id).Select(select => new ConversationSimpleDTO()
             {
                 Id = select.Id,
@@ -42,6 +46,10 @@ namespace Chat.Application.Services
         public ConversationDTO GetConversation(int conversationId, string username)
         {
             var user = _unitOfWork.UserRepository.GetByUserName(username);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
             var conversationEntity = _unitOfWork.ConversationRepository.GetById(conversationId, user.Id);
             if (conversationEntity == null)
             {
