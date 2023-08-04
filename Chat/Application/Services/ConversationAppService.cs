@@ -147,6 +147,14 @@ namespace Chat.Application.Services
 
             var result = _mapper.Map<ConversationSimpleDTO>(conversation);
 
+            result.LastMessage.OwnMessage = true;
+
+            if (HubConnections.HasUser(requester.UserName))
+                _chatHub.Clients
+                    .Clients(HubConnections.GetConnectionsByUser(requester.UserName))
+                    .SendAsync("NewConversation", result);
+
+
             result.LastMessage.OwnMessage = false;
             
             return result;

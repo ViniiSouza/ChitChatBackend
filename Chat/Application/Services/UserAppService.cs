@@ -46,7 +46,10 @@ namespace Chat.Application.Services
             _unitOfWork.MessageRequestRepository.CreateRequest(requester.Id, receiver.Id, dto.Message);
             _unitOfWork.Save();
 
-            _chatHub.Clients.Client(dto.Receiver).SendAsync("RequestReceived");
+            if (HubConnections.HasUser(dto.Receiver))
+                _chatHub.Clients
+                    .Clients(HubConnections.GetConnectionsByUser(dto.Receiver))
+                    .SendAsync("RequestReceived");
 
             return null;
         }
