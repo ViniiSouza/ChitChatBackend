@@ -235,10 +235,16 @@ namespace Chat.Application.Services
 
             var result = _mapper.Map<ConversationSimpleDTO>(conversation);
 
-            result.LastMessage.OwnMessage = true;
             result.LastMessage.SenderName = creator.Name;
             result.Id = conversation.Id;
             result.Title = receiver.Name;
+
+            if (HubConnections.HasUser(receiver.UserName))
+                _chatHub.Clients
+                    .Clients(HubConnections.GetConnectionsByUser(receiver.UserName))
+                    .SendAsync("NewConversation", result);
+
+            result.LastMessage.OwnMessage = true;
 
             return result;
         }
