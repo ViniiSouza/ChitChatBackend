@@ -58,6 +58,12 @@ namespace Chat.Application.Services
             var messages = _unitOfWork.MessageRepository.GetPaged(conversationEntity.Id);
             var conversation = _mapper.Map<ConversationDTO>(conversationEntity);
 
+            if (conversation.Type == EChatType.Private)
+            {
+                conversation.ReceiverId = conversationEntity.Participants.FirstOrDefault(where => where.UserId != user.Id).UserId;
+                conversation.IsContact = _unitOfWork.User_ContactRepository.UserIsContact(user.Id, conversation.ReceiverId.Value);
+            }
+
             conversation.Messages = messages.Select(select => new MessageDTO()
             {
                 Id = select.Id,

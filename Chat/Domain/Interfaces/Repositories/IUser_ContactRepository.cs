@@ -6,6 +6,10 @@ namespace Chat.Domain.Interfaces.Repositories
     {
         List<UserContact> GetContactsByUserId(int userId);
 
+        bool UserIsContact(int userId, int targetId);
+
+        bool AddUserContact(int userId, int targetId);
+
         bool RemoveUserContact(int userId, int contactId);
     }
 }

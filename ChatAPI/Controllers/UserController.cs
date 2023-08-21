@@ -59,6 +59,13 @@ namespace ChatAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost("contacts/{id}")]
+        public IActionResult AddContact([FromRoute] int id)
+        {
+            _appService.AddContact(GetUserNameFromRequest(), id);
+            return StatusCode(201);
+        }
+
         [HttpDelete("contacts/{id}")]
         public IActionResult RemoveContact([FromRoute] int id)
         {

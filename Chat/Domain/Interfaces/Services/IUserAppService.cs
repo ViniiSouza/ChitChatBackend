@@ -16,6 +16,8 @@ namespace Chat.Domain.Interfaces.Services
         /// <returns>The list of contacts of the user</returns>
         List<ContactDTO> GetContactsByUser(string userName);
 
+        bool AddContact(string userName, int targetContactId);
+
         bool RemoveContact(string userName, int targetContactId);
 
         UserSearchDTO SearchUser(string requester, string targetUser);

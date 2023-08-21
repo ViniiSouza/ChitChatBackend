@@ -9,7 +9,7 @@ namespace Chat.Application.Mappers.Profiles
         public ConversationProfile()
         {
             CreateMap<Conversation, ConversationSimpleDTO>();
-            CreateMap<Conversation, ConversationDTO>();
+            CreateMap<Conversation, ConversationDTO>().ForMember(dest => dest.Participants, opt => opt.Ignore());
         }
     }
 }

@@ -66,7 +66,10 @@ namespace Chat.Infra.Repositories
 
         public Conversation? GetById(int id, int userId)
         {
-            var query = _context.Set<Conversation>().AsNoTracking().Where(where => where.Id == id && where.Participants.Any(any => any.UserId == userId));
+            var query = _context.Set<Conversation>()
+                                    .Include(include => include.Participants)
+                                    .AsNoTracking().Where(where => where.Id == id && where.Participants
+                                    .Any(any => any.UserId == userId));
 
             return query.FirstOrDefault();
         }

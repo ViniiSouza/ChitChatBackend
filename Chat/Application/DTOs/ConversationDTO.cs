@@ -13,5 +13,9 @@ namespace Chat.Application.DTOs
         public string? Title { get; set; }
 
         public List<MessageDTO> Messages { get; set; }
+
+        public int? ReceiverId { get; set; }
+
+        public bool? IsContact { get; set; }
     }
 }

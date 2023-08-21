@@ -71,6 +71,25 @@ namespace Chat.Application.Services
             }).ToList();
         }
 
+        public bool AddContact(string userName, int targetContactId)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            if (_unitOfWork.User_ContactRepository.UserIsContact(user.Id, targetContactId))
+            {
+                throw new InvalidOperationException("User already is a contact!");
+            }
+
+            var result = _unitOfWork.User_ContactRepository.AddUserContact(user.Id, targetContactId);
+            _unitOfWork.Save();
+            return result;
+        }
+
         public bool RemoveContact(string userName, int targetContactId)
         {
             var user = _unitOfWork.UserRepository.GetByUserName(userName);
