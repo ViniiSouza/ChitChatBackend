@@ -31,6 +31,10 @@ namespace Chat.Infra.Repositories
         public bool RemoveUserContact(int userId, int contactId)
         {
             var entity = _context.Set<UserContact>().Where(where => where.UserId == userId && where.ContactId == contactId).FirstOrDefault();
+            if (entity == null)
+            {
+                return false;
+            }
             _context.Set<UserContact>().Remove(entity);
             return true;
         }

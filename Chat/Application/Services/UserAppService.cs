@@ -100,6 +100,11 @@ namespace Chat.Application.Services
             }
 
             var result = _unitOfWork.User_ContactRepository.RemoveUserContact(user.Id, targetContactId);
+
+            if (!result)
+            {
+                throw new InvalidOperationException("Something went wrong. Try again!");
+            }
             _unitOfWork.Save();
             return result;
         }
