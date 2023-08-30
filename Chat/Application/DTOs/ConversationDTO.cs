@@ -17,5 +17,7 @@ namespace Chat.Application.DTOs
         public int? ReceiverId { get; set; }
 
         public bool? IsContact { get; set; }
+
+        public bool HasPreviousMessages { get; set; }
     }
 }

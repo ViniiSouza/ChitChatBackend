@@ -37,6 +37,14 @@ namespace Chat.Domain.Interfaces.Services
         ConversationDTO GetConversation(int conversationId, string username);
 
         /// <summary>
+        /// Retrieve the messages sent before the <paramref name="messageId"/> one and within the conversation <paramref name="conversationId"/>
+        /// </summary>
+        /// <param name="conversationId">Id of the conversation</param>
+        /// <param name="messageId">Id of the message to filter</param>
+        /// <returns>A DTO containing the messages and whether there are messages before those returned</returns>
+        ConversationDTO GetBeforeMessage(int conversationId, int messageId);
+
+        /// <summary>
         /// Get private conversation, if exists, between <paramref name="userName"/> and <paramref name="targetUserName"/>
         /// </summary>
         /// <param name="userName"></param>

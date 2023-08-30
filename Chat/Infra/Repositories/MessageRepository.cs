@@ -26,5 +26,20 @@ namespace Chat.Infra.Repositories
                 .Skip(skipCount).Take(pageSize)
                 .OrderBy(order => order.CreationDate).ToList();
         }
+
+        public List<Message> GetBeforeMessage(int conversationId, int messageId, int amount = 20)
+        {
+            return _context.Set<Message>()
+                .OrderByDescending(by => by.CreationDate)
+                .Include(include => include.Sender)
+                .Where(where => where.ChatId == conversationId && where.Id < messageId)
+                .Take(amount)
+                .OrderBy(order => order.CreationDate).ToList();
+        }
+
+        public bool HasMessagesBefore(int messageId, int conversationId)
+        {
+            return _context.Set<Message>().Any(where => where.ChatId == conversationId && where.Id < messageId);
+        }
     }
 }

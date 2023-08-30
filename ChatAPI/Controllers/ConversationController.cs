@@ -46,6 +46,13 @@ namespace ChatAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}/messages")]
+        public IActionResult GetMessagesBefore([FromRoute] int id, [FromQuery] int messageId)
+        {
+            var result = _appService.GetBeforeMessage(id, messageId);
+            return Ok(result);
+        }
+
         [HttpGet("simple/{targetUserName}")]
         public IActionResult FindSimpleConversation([FromRoute] string targetUserName)
         {

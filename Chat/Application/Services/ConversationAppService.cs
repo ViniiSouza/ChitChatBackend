@@ -57,6 +57,7 @@ namespace Chat.Application.Services
             }
             var messages = _unitOfWork.MessageRepository.GetPaged(conversationEntity.Id);
             var conversation = _mapper.Map<ConversationDTO>(conversationEntity);
+            conversation.HasPreviousMessages = _unitOfWork.MessageRepository.HasMessagesBefore(messages.First().Id, conversationEntity.Id);
 
             if (conversation.Type == EChatType.Private)
             {
@@ -75,6 +76,20 @@ namespace Chat.Application.Services
             }).ToList();
 
             return conversation;
+        }
+
+        public ConversationDTO GetBeforeMessage(int conversationId, int messageId)
+        {
+            var messages = _unitOfWork.MessageRepository.GetBeforeMessage(conversationId, messageId);
+            var dtos = _mapper.Map<List<MessageDTO>>(messages);
+
+            var conversationDto = new ConversationDTO()
+            {
+                HasPreviousMessages = _unitOfWork.MessageRepository.HasMessagesBefore(messages.First().Id, conversationId),
+                Id = conversationId,
+                Messages = dtos
+            };
+            return conversationDto;
         }
 
         public ConversationSimpleDTO CreatePrivateByRequest(int messageRequestId, string userName)
