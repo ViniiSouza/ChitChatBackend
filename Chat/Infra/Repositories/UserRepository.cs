@@ -1,6 +1,8 @@
 ﻿using Chat.Domain.Interfaces.Repositories;
 using Chat.Domain.Models;
 using Chat.Infra.Contexts;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Chat.Infra.Repositories
 {
@@ -17,24 +19,20 @@ namespace Chat.Infra.Repositories
 
         public override IEnumerable<User> GetAll()
         {
-            return _context.Set<User>().Select(select => new User()
+            var result = _context.Set<User>().AsNoTracking().ToList();
+            foreach (var user in result)
             {
-                Id= select.Id,
-                Name = select.Name,
-                UserName = select.UserName,
-                CreationDate= select.CreationDate
-            }).ToList();
+                user.Password = "";
+            }
+            return result;
         }
 
-        public override User? GetById(int id)
+        public override User? GetById(int id, params Expression<Func<User, object>>[] includes)
         {
-            return _context.Set<User>().Select(select => new User()
-            {
-                Id= select.Id,
-                Name = select.Name,
-                UserName = select.UserName,
-                CreationDate = select.CreationDate
-            }).FirstOrDefault(find => find.Id == id); ;
+            // includes is not being used here
+            var result = _context.Set<User>().AsNoTracking().Where(where => where.Id == id).FirstOrDefault();
+            result.Password = "";
+            return result;
         }
 
         public override void Create(User entity)
@@ -46,13 +44,10 @@ namespace Chat.Infra.Repositories
 
         public User? GetByUserName(string username)
         {
-            return _context.Set<User>().Select(select => new User()
-            {
-                Id = select.Id,
-                Name = select.Name,
-                UserName = select.UserName,
-                CreationDate = select.CreationDate
-            }).FirstOrDefault(find => find.UserName == username.ToLower());
+            var result = _context.Set<User>().AsNoTracking().Where(where => where.UserName == username.ToLower()).FirstOrDefault();
+            if (result == null) return null;
+            result.Password = null;
+            return result;
         }
 
         public void SetLastLogin(string username)
@@ -61,6 +56,14 @@ namespace Chat.Infra.Repositories
             entity.LastLogin = DateTime.Now;
             _context.Attach(entity);
             _context.Entry(entity).Property(p => p.LastLogin).IsModified = true;
+        }
+
+        public void SetLastSeen(string username, DateTime date)
+        {
+            var entity = GetByUserName(username);
+            entity.LastSeen = date;
+            _context.Attach(entity);
+            _context.Entry(entity).Property(p => p.LastSeen).IsModified = true;
         }
     }
 }

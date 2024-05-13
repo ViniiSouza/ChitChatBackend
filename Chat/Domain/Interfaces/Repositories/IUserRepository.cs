@@ -9,5 +9,7 @@ namespace Chat.Domain.Interfaces.Repositories
         User? GetByUserName(string username);
 
         void SetLastLogin(string username);
+
+        void SetLastSeen(string username, DateTime date);
     }
 }

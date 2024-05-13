@@ -17,11 +17,6 @@ namespace Chat.Infra.Mappings
                 .HasForeignKey(prop => prop.SenderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(prop => prop.Receiver)
-                .WithMany(prop => prop.ReceivedMessages)
-                .HasForeignKey(prop => prop.ReceiverId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasOne(prop => prop.Chat)
                 .WithMany()
                 .HasForeignKey(prop => prop.ChatId)

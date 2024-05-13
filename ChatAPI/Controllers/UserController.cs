@@ -1,6 +1,8 @@
-﻿using Chat.Domain.Interfaces.Services;
+﻿using Chat.Application.DTOs;
+using Chat.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ChatAPI.Controllers
 {
@@ -38,11 +40,10 @@ namespace ChatAPI.Controllers
             return Ok(result);
         }
 
-        #region Message request
         [HttpPost("request")]
-        public IActionResult RequestMessage([FromQuery] string requester, [FromQuery] string receiver, [FromQuery] string message)
+        public IActionResult RequestMessage([FromBody] MessagePermissionCreateDTO dto)
         {
-            var response = _appService.RequestMessage(requester, receiver, message);
+            var response = _appService.RequestMessage(GetUserNameFromRequest(), dto);
             if (response != null)
             {
                 return Conflict(response);
@@ -51,8 +52,59 @@ namespace ChatAPI.Controllers
             return StatusCode(201);
         }
 
-        #endregion
+        [HttpGet("contacts")]
+        public IActionResult GetContacts()
+        {
+            var result = _appService.GetContactsByUser(GetUserNameFromRequest());
+            return Ok(result);
+        }
 
+        [HttpPost("contacts/{id}")]
+        public IActionResult AddContact([FromRoute] int id)
+        {
+            _appService.AddContact(GetUserNameFromRequest(), id);
+            return StatusCode(201);
+        }
 
+        [HttpDelete("contacts/{id}")]
+        public IActionResult RemoveContact([FromRoute] int id)
+        {
+            _appService.RemoveContact(GetUserNameFromRequest(), id);
+            return Ok();
+        }
+
+        [HttpGet("search")]
+        public IActionResult SearchUser([FromQuery] string username)
+        {
+            try
+            {
+                var result = _appService.SearchUser(GetUserNameFromRequest(), username);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("request/all")]
+        public IActionResult GetRequestsByUser()
+        {
+            var result = _appService.GetRequestsByUser(GetUserNameFromRequest());
+
+            return Ok(result);
+        }
+
+        [HttpDelete("request")]
+        public IActionResult RefuseRequest([FromQuery] int requestId)
+        {
+            _appService.RefuseRequest(GetUserNameFromRequest(), requestId);
+            return Ok();
+        }
+
+        private string GetUserNameFromRequest()
+        {
+            return (HttpContext.User.Identity as ClaimsIdentity).FindFirst(ClaimTypes.Name.ToString()).Value;
+        }
     }
 }

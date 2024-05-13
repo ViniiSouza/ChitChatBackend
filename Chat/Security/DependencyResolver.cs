@@ -17,11 +17,15 @@ namespace Chat.Security
             service.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             service.AddTransient(typeof(IUserRepository), typeof(UserRepository));
             service.AddTransient(typeof(IMessageRequestRepository), typeof(MessageRequestRepository));
+            service.AddTransient(typeof(IConversationRepository), typeof(ConversationRepository));
+            service.AddTransient(typeof(IMessagePermissionRepository), typeof(MessagePermissionRepository));
 
             // app services
             service.AddTransient(typeof(IBaseAppService<,>), typeof(BaseAppService<,>));
             service.AddTransient(typeof(IUserAppService), typeof(UserAppService));
             service.AddTransient(typeof(IAuthenticationAppService), typeof(AuthenticationAppService));
+            service.AddTransient(typeof(IConversationAppService), typeof(ConversationAppService));
+            service.AddTransient(typeof(IMessagePermissionAppService), typeof(MessagePermissionAppService));
         }
     }
 }

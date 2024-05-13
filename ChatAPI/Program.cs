@@ -1,7 +1,7 @@
 using AutoMapper;
+using Chat.Hubs;
 using Chat.Infra.Contexts;
 using Chat.Security;
-using ChatAPI.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -86,7 +86,7 @@ app.UseCors(builder => builder
 .AllowAnyMethod()
 .AllowAnyHeader());
 
-app.MapHub<ChatHub>("/chat");
+app.MapHub<ChatHub>("/hubs/chat");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

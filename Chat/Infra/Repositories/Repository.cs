@@ -1,6 +1,8 @@
 ﻿using Chat.Domain.Interfaces.Repositories;
 using Chat.Domain.Models;
 using Chat.Infra.Contexts;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Chat.Infra.Repositories
 {
@@ -26,17 +28,30 @@ namespace Chat.Infra.Repositories
 
         public virtual IEnumerable<T> GetAll()
         {
-            return _context.Set<T>().ToList();
+            return _context.Set<T>().AsNoTracking().ToList();
         }
 
-        public virtual T? GetById(int id)
+        public virtual T? GetById(int id, params Expression<Func<T, object>>[] includes)
         {
-            return _context.Set<T>().FirstOrDefault(find => find.Id == id);
+            var query = _context.Set<T>().AsNoTracking().Where(where => where.Id == id);
+            
+            if (includes != null && includes.Any())
+            {
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            }
+
+            return query.FirstOrDefault();
+
         }
 
         public virtual void Update(T entity)
         {
             _context.Update(entity);
+        }
+
+        public virtual void DetachInstance(T instance)
+        {
+            _context.Entry(instance).State = EntityState.Detached;
         }
     }
 }

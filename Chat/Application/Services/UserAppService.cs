@@ -2,30 +2,207 @@
 using Chat.Application.DTOs;
 using Chat.Domain.Interfaces.Services;
 using Chat.Domain.Models;
-using Chat.Extensions;
+using Chat.Hubs;
 using Chat.Infra.Data;
-using Chat.Security;
+using Chat.Utils.Enums;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Chat.Application.Services
 {
     public class UserAppService : BaseAppService<UserDTO, User>, IUserAppService
     {
-        public UserAppService(IMapper mapper, UnitOfWork unitOfWork) : base(mapper, unitOfWork)
+        private readonly IHubContext<ChatHub> _chatHub;
+
+        public UserAppService(IMapper mapper, UnitOfWork unitOfWork, IHubContext<ChatHub> chatHub) : base(mapper, unitOfWork)
         {
+            _chatHub = chatHub;
         }
 
-        public string? RequestMessage(string requesterUsername, string receiverUsername, string message)
+        public UserDTO GetUserByUserName(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            return _mapper.Map<UserDTO>(user);
+        }
+
+        public string? RequestMessage(string requesterUsername, MessagePermissionCreateDTO dto)
         {
             var requester = _unitOfWork.UserRepository.GetByUserName(requesterUsername);
-            var receiver = _unitOfWork.UserRepository.GetByUserName(receiverUsername);
+            if (requester == null)
+                throw new InvalidOperationException("Invalid username. Try again!");
+            var receiver = _unitOfWork.UserRepository.GetByUserName(dto.Receiver);
+            if (receiver == null)
+                throw new InvalidOperationException("Invalid username. Try again!");
             if (_unitOfWork.MessageRequestRepository.ExistsRequest(requester.Id, receiver.Id))
             {
                 return "A message request already exists for this user!";
             }
 
-            _unitOfWork.MessageRequestRepository.CreateRequest(requester.Id, receiver.Id, message);
+            _unitOfWork.MessageRequestRepository.CreateRequest(requester.Id, receiver.Id, dto.Message);
             _unitOfWork.Save();
+
+            if (HubConnections.HasUser(dto.Receiver))
+                _chatHub.Clients
+                    .Clients(HubConnections.GetConnectionsByUser(dto.Receiver))
+                    .SendAsync("RequestReceived");
+
             return null;
+        }
+
+        public List<ContactDTO> GetContactsByUser(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            return _unitOfWork.User_ContactRepository.GetContactsByUserId(user.Id).Select(select => new ContactDTO()
+            {
+                Id = select.ContactId,
+                Name = select.Contact.Name,
+                UserName = select.Contact.UserName
+            }).ToList();
+        }
+
+        public bool AddContact(string userName, int targetContactId)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            if (_unitOfWork.User_ContactRepository.UserIsContact(user.Id, targetContactId))
+            {
+                throw new InvalidOperationException("User already is a contact!");
+            }
+
+            var result = _unitOfWork.User_ContactRepository.AddUserContact(user.Id, targetContactId);
+            _unitOfWork.Save();
+            return result;
+        }
+
+        public bool RemoveContact(string userName, int targetContactId)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            var result = _unitOfWork.User_ContactRepository.RemoveUserContact(user.Id, targetContactId);
+
+            if (!result)
+            {
+                throw new InvalidOperationException("Something went wrong. Try again!");
+            }
+            _unitOfWork.Save();
+            return result;
+        }
+
+        public UserSearchDTO SearchUser(string requester, string targetUser)
+        {
+            if (requester == targetUser)
+            {
+                throw new InvalidOperationException("You cannot invite yourself!");
+            }
+
+            var user = _unitOfWork.UserRepository.GetByUserName(requester);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            var target = _unitOfWork.UserRepository.GetByUserName(targetUser);
+
+            if (target == null)
+            {
+                throw new InvalidOperationException("User not found!");
+            }
+
+            var dto = _mapper.Map<UserSearchDTO>(target);
+
+            if (_unitOfWork.MessagePermissionRepository.CanUserMessage(user.Id, target.Id))
+            {
+                dto.Type = _unitOfWork.ConversationRepository.ExistsPrivateConversation(user.Id, target.Id) ? ESearchUserType.AlreadyHasChat : ESearchUserType.HasPermission;
+            }
+            else if (target.IsPublicProfile)
+            {
+                dto.Type = ESearchUserType.PublicProfile;
+                
+            }
+            else
+            {
+                dto.Type = _unitOfWork.MessageRequestRepository.ExistsRequest(user.Id, target.Id) ? ESearchUserType.AlreadySentInvite : ESearchUserType.PrivateProfile;
+            }
+
+            return dto;
+        }
+
+        public void UpdateUserLastSeen(string userName, DateTime date)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+            if (user != null)
+            {
+                _unitOfWork.UserRepository.SetLastSeen(userName, date);
+                _unitOfWork.Save();
+            }
+        }
+
+        public DateTime GetUserLastLogin(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            return user.LastLogin;
+        }
+
+        public List<MessageRequestDTO> GetRequestsByUser(string userName)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+
+            var requests = _unitOfWork.MessageRequestRepository.GetRequestsByUser(user.Id);
+
+            return _mapper.Map<List<MessageRequestDTO>>(requests);
+        }
+
+        public void RefuseRequest(string userName, int requestId)
+        {
+            var user = _unitOfWork.UserRepository.GetByUserName(userName);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid username. Try again!");
+            }
+            var request = _unitOfWork.MessageRequestRepository.GetById(requestId);
+            if (request == null)
+            {
+                throw new InvalidOperationException("Request not found!");
+            }
+
+            if (request.ReceiverId != user.Id)
+            {
+                throw new InvalidOperationException("You can't refuse this request!");
+            }
+
+            _unitOfWork.MessageRequestRepository.Delete(request);
+            _unitOfWork.Save();
         }
     }
 }

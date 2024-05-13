@@ -15,4 +15,28 @@
         Addition = 3,
         Removal = 4
     }
+
+    public enum EMessageSender
+    {
+        None = 0,
+        Self = 1,
+        Other = 2
+    }
+
+    public enum ESearchUserType
+    {
+        None = 0,
+        PublicProfile = 1,
+        PrivateProfile = 2,
+        HasPermission = 3,
+        AlreadyHasChat = 4,
+        AlreadySentInvite = 5,
+    }
+
+    public enum EStatus
+    {
+        None = 0,
+        Online = 1,
+        Offline = 2
+    }
 }
