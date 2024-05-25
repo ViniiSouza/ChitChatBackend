@@ -51,10 +51,10 @@ builder.Services.AddDependencies();
 string profilesPath = String.Empty;
 string settingsName = String.Empty;
 #if DEBUG
-profilesPath = @"..\Chat\bin\Debug\net6.0\Chat.dll";
+profilesPath = @"..\Chat\bin\Debug\net8.0\Chat.dll";
 settingsName = "appsettings.Development.json";
 #else
-profilesPath = @"..\Chat\bin\Release\net6.0\Chat.dll";
+profilesPath = @"..\Chat\bin\Release\net8.0\Chat.dll";
 settingsName = "appsettings.json";
 #endif
 
