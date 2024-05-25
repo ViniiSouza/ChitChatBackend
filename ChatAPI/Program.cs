@@ -1,4 +1,5 @@
 using AutoMapper;
+using Chat.Helpers;
 using Chat.Hubs;
 using Chat.Infra.Contexts;
 using Chat.Security;
@@ -98,6 +99,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<JwtMiddleware>();
 
 app.MapControllers();
 
