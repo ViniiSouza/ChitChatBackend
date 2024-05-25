@@ -15,9 +15,9 @@ namespace Chat.Infra.Contexts
         {
             string profilesPath = String.Empty;
 #if DEBUG
-            profilesPath = @"..\Chat\bin\Debug\net6.0\Chat.dll";
+            profilesPath = @"..\Chat\bin\Debug\net8.0\Chat.dll";
 #else
-            profilesPath = @"..\Chat\bin\Release\net6.0\Chat.dll";
+            profilesPath = @"..\Chat\bin\Release\net8.0\Chat.dll";
 #endif
             var assembly = Assembly.LoadFrom(profilesPath);
             var typesToRegister = assembly.GetTypes()
