@@ -13,13 +13,8 @@ namespace Chat.Infra.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            string profilesPath = String.Empty;
-#if DEBUG
-            profilesPath = @"..\Chat\bin\Debug\net8.0\Chat.dll";
-#else
-            profilesPath = @"..\Chat\bin\Release\net8.0\Chat.dll";
-#endif
-            var assembly = Assembly.LoadFrom(profilesPath);
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(a => a.GetName().Name == "Chat");
+            //var assembly = Assembly.LoadFrom(profilesPath);
             var typesToRegister = assembly.GetTypes()
             .Where(type => type.Name.EndsWith("Map") &&
                            type.GetInterfaces().Any(i => i.IsGenericType &&

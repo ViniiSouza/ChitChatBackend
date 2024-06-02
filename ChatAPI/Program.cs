@@ -5,7 +5,6 @@ using Chat.Infra.Contexts;
 using Chat.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,18 +48,7 @@ builder.Services.AddSwaggerGen(option =>
 // dependency injection
 builder.Services.AddDependencies();
 
-string profilesPath = String.Empty;
-string settingsName = String.Empty;
-#if DEBUG
-profilesPath = @"..\Chat\bin\Debug\net8.0\Chat.dll";
-settingsName = "appsettings.Development.json";
-#else
-profilesPath = @"..\Chat\bin\Release\net8.0\Chat.dll";
-settingsName = "appsettings.json";
-#endif
-
-// AutoMapper profiles injection
-var assembly = Assembly.LoadFrom(profilesPath);
+var assembly = AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(a => a.GetName().Name == "Chat");
 var profileTypes = assembly.GetTypes()
     .Where(type => type.Name.EndsWith("Profile") && typeof(Profile).IsAssignableFrom(type) && type != typeof(Profile))
     .ToArray();
@@ -68,7 +56,14 @@ if (profileTypes != null && profileTypes.Length > 0)
     builder.Services.AddAutoMapper(profileTypes);
 
 // adds appsettings to configuration
-builder.Configuration.AddJsonFile(settingsName, optional: false, reloadOnChange: true);
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+}
+else
+{
+    builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+}
 var config = builder.Configuration;
 builder.Services.AddSingleton<IConfiguration>(config);
 
@@ -89,10 +84,11 @@ app.UseCors(builder => builder
 
 app.MapHub<ChatHub>("/hubs/chat");
 
+app.UseSwagger();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
     app.UseSwaggerUI();
 }
 
