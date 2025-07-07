@@ -65,29 +65,59 @@ namespace Chat.Application.Services
                 conversation.IsContact = _unitOfWork.User_ContactRepository.UserIsContact(user.Id, conversation.ReceiverId.Value);
             }
 
-            conversation.Messages = messages.Select(select => new MessageDTO()
-            {
-                Id = select.Id,
-                Action = select.Action,
-                Content = select.Content,
-                SenderName = select.Sender is not null ? select.Sender.Name : "",
-                OwnMessage = select.Sender is not null && select.Sender.UserName == username,
-                SendingTime = select.CreationDate
-            }).ToList();
+            var groupedMessages = messages
+                .GroupBy(m => DateOnly.FromDateTime(m.CreationDate))
+                .OrderBy(g => g.Key);
+
+            conversation.Messages = groupedMessages
+                .Select(group => new MessageGroupDTO
+                {
+                    Date = group.Key,
+                    Messages = group
+                        .OrderBy(m => m.CreationDate)
+                        .Select(select => new MessageDTO
+                        {
+                            Id = select.Id,
+                            Action = select.Action,
+                            Content = select.Content,
+                            SenderName = select.Sender != null ? select.Sender.Name : "",
+                            OwnMessage = select.Sender != null && select.Sender.UserName == username,
+                            SendingTime = select.CreationDate
+                        }).ToList()
+                }).ToList();
 
             return conversation;
         }
 
-        public ConversationDTO GetBeforeMessage(int conversationId, int messageId)
+        public ConversationDTO GetBeforeMessage(int conversationId, int messageId, string username)
         {
             var messages = _unitOfWork.MessageRepository.GetBeforeMessage(conversationId, messageId);
-            var dtos = _mapper.Map<List<MessageDTO>>(messages);
+            var groupedMessages = messages
+                .GroupBy(m => DateOnly.FromDateTime(m.CreationDate))
+                .OrderBy(g => g.Key);
+
+            var groupedMessageDtos = groupedMessages
+                .Select(group => new MessageGroupDTO
+                {
+                    Date = group.Key,
+                    Messages = group
+                        .OrderBy(m => m.CreationDate)
+                        .Select(select => new MessageDTO
+                        {
+                            Id = select.Id,
+                            Action = select.Action,
+                            Content = select.Content,
+                            SenderName = select.Sender != null ? select.Sender.Name : "",
+                            OwnMessage = select.Sender != null && select.Sender.UserName == username,
+                            SendingTime = select.CreationDate
+                        }).ToList()
+                }).ToList();
 
             var conversationDto = new ConversationDTO()
             {
                 HasPreviousMessages = _unitOfWork.MessageRepository.HasMessagesBefore(messages.First().Id, conversationId),
                 Id = conversationId,
-                Messages = dtos
+                Messages = groupedMessageDtos
             };
             return conversationDto;
         }

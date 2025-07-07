@@ -41,8 +41,9 @@ namespace Chat.Domain.Interfaces.Services
         /// </summary>
         /// <param name="conversationId">Id of the conversation</param>
         /// <param name="messageId">Id of the message to filter</param>
+        /// <param name="username">Token username</param>
         /// <returns>A DTO containing the messages and whether there are messages before those returned</returns>
-        ConversationDTO GetBeforeMessage(int conversationId, int messageId);
+        ConversationDTO GetBeforeMessage(int conversationId, int messageId, string username);
 
         /// <summary>
         /// Get private conversation, if exists, between <paramref name="userName"/> and <paramref name="targetUserName"/>

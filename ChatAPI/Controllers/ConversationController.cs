@@ -49,7 +49,7 @@ namespace ChatAPI.Controllers
         [HttpGet("{id}/messages")]
         public IActionResult GetMessagesBefore([FromRoute] int id, [FromQuery] int messageId)
         {
-            var result = _appService.GetBeforeMessage(id, messageId);
+            var result = _appService.GetBeforeMessage(id, messageId, GetUserNameFromRequest());
             return Ok(result);
         }
 
