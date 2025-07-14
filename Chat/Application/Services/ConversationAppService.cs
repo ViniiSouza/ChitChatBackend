@@ -168,23 +168,33 @@ namespace Chat.Application.Services
                 ChatId = conversation.Id
             };
 
-            Message firstMessage = new Message()
+            Message requestMessage = new Message()
             {
                 Action = EMessageAction.Content,
                 Content = messageRequest.CustomInvite is not null ? messageRequest.CustomInvite : "Hello!",
-                CreationDate = DateTime.Now,
+                CreationDate = messageRequest.CreationDate,
                 SenderId = requester.Id,
                 ChatId = conversation.Id
             };
 
+            Message acceptedMessage = new Message()
+            {
+                Action = EMessageAction.AcceptedRequest,
+                Content = "accepted",
+                CreationDate = DateTime.Now,
+                SenderId = receiver.Id,
+                ChatId = conversation.Id,
+            };
+
             _unitOfWork.MessageRepository.Create(creationMessage);
-            _unitOfWork.MessageRepository.Create(firstMessage);
+            _unitOfWork.MessageRepository.Create(requestMessage);
+            _unitOfWork.MessageRepository.Create(acceptedMessage);
 
             _unitOfWork.Save();
 
             _unitOfWork.ConversationRepository.DetachInstance(conversation);
 
-            _unitOfWork.ConversationRepository.UpdateLastMessage(conversation.Id, firstMessage.Id);
+            _unitOfWork.ConversationRepository.UpdateLastMessage(conversation.Id, acceptedMessage.Id);
 
             _unitOfWork.Save();
 
@@ -192,21 +202,22 @@ namespace Chat.Application.Services
 
             _unitOfWork.Save();
 
-            conversation.LastMessage = firstMessage;
+            conversation.LastMessage = acceptedMessage;
 
             conversation.Title = requester.Name;
 
             var result = _mapper.Map<ConversationSimpleDTO>(conversation);
 
-            result.LastMessage.OwnMessage = true;
+            result.LastMessage.OwnMessage = false;
 
+            // send notification to requester if they are online
             if (HubConnections.HasUser(requester.UserName))
                 _chatHub.Clients
                     .Clients(HubConnections.GetConnectionsByUser(requester.UserName))
                     .SendAsync("NewConversation", result);
 
 
-            result.LastMessage.OwnMessage = false;
+            result.LastMessage.OwnMessage = true;
             
             return result;
         }

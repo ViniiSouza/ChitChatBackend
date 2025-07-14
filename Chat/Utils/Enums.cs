@@ -13,7 +13,8 @@
         Content = 1,
         Creation = 2,
         Addition = 3,
-        Removal = 4
+        Removal = 4,
+        AcceptedRequest = 5,
     }
 
     public enum EMessageSender
